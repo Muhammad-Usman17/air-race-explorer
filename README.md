@@ -126,3 +126,37 @@ CI runs both on every push and pull request to `main`.
 **`useEvents` hook** — fetches from the NestJS API; static seed data in `apps/web/src/data/events.ts` mirrors the API exactly and acts as a dev fallback.
 
 ---
+
+## What I'd Improve With More Time
+
+**Persistence & data**
+- Replace in-memory seed data with a real database (PostgreSQL + TypeORM or Prisma) so events can be created, updated, and deleted without a redeploy
+- Add a CMS integration (Contentful or Sanity) for non-technical editors to manage event copy and images
+
+**Auth & multi-tenancy**
+- Add JWT-based authentication so race organisers can manage their own events
+- Role-based access control (admin vs. read-only viewer)
+
+**UX & features**
+- Date-range filter and a calendar view alongside the map
+- Upcoming vs. past event grouping with a countdown timer on the detail page
+- Clustered map markers for when many events are geographically close
+- Skeleton loading states instead of a spinner for a smoother perceived performance
+- Fully responsive mobile layout (currently optimised for desktop)
+- Keyboard navigation through the event list and map markers for full accessibility
+
+**Search**
+- Replace Nominatim with a proper autocomplete (e.g. Mapbox Geocoding or Algolia) for faster, more accurate suggestions
+- Add full-text search across event titles, descriptions, and venues
+
+**Testing & quality**
+- End-to-end tests with Playwright covering the key user journeys (filter → select → detail → back)
+- Visual regression tests with Chromatic or Percy
+- API contract tests (OpenAPI schema validation) to catch breaking changes early
+
+**Infrastructure**
+- Add a proper CD pipeline with environment promotion (staging → production) and rollback
+- CDN for static assets and hero images (currently hotlinked from Unsplash)
+- Health-check endpoint and structured logging on the API for production observability
+
+---
