@@ -1,116 +1,92 @@
 # Air Race Explorer
 
-A full-stack demo project built for Zooom Productions, showcasing an interactive explorer for air race events around the world.
-
-## Project Overview
-
-Air Race Explorer is a web application that lets users browse, filter, and explore air race events on an interactive map. Each event includes details such as title, description, location, category, and date. The project demonstrates a clean monorepo architecture with a React frontend and a NestJS backend API.
+A full-stack demo project built for Zooom Productions — an interactive explorer for an international Air Race event series.
 
 ---
 
 ## Architecture
 
-This project is organized as an **npm workspaces monorepo**:
+npm workspaces monorepo:
 
 ```
 air-race-explorer/
 ├── apps/
-│   ├── web/          # React + Vite + TypeScript frontend
-│   └── api/          # NestJS backend
-├── README.md
-├── .gitignore
-└── package.json      # root (workspaces)
+│   ├── web/    # React + Vite + TypeScript
+│   └── api/    # NestJS REST API
+├── package.json
+└── README.md
 ```
-
-### apps/web — Frontend
-- **React + Vite + TypeScript** for a fast, type-safe UI
-- **React-Leaflet + OpenStreetMap** for interactive mapping (no API key required)
-- **Tailwind CSS** for utility-first styling
-- **Axios** for HTTP requests to the API
-
-### apps/api — Backend
-- **NestJS** for a structured, opinionated REST API
-- Strict TypeScript mode enabled
-- Designed to be extended with a database or CMS integration
 
 ---
 
-## Setup Instructions
+## Setup
 
 ### Prerequisites
+- Node.js 18+
+- npm 9+
 
-- **Node.js 18+** (LTS recommended)
-- **npm 9+**
-
-### Install dependencies
-
-From the repository root, run:
+### Install
 
 ```bash
 npm install
 ```
 
-This installs dependencies for all workspaces (root, `apps/web`, and `apps/api`) in one step.
-
-### Run both apps concurrently
+### Run both apps
 
 ```bash
 npm run dev
 ```
 
-This starts both the frontend and backend simultaneously:
+| App      | URL                    |
+|----------|------------------------|
+| Frontend | http://localhost:5173  |
+| API      | http://localhost:3000  |
 
-| App      | URL                      |
-|----------|--------------------------|
-| Frontend | http://localhost:5173    |
-| API      | http://localhost:3000    |
-
-### Run apps individually
+### Run individually
 
 ```bash
-# Frontend only
-npm run dev:web
-
-# Backend only
-npm run dev:api
+npm run dev:web   # frontend only
+npm run dev:api   # backend only
 ```
+
+### API endpoints
+
+```
+GET /api/events                        # all events
+GET /api/events?category=Grand+Prix    # filtered by category
+GET /api/events/categories             # list of all categories
+GET /api/events/:id                    # single event
+```
+
+---
+
+## Features
+
+- **Map view** — Leaflet + OpenStreetMap, custom markers per category (no API key required)
+- **Event list** — scrollable sidebar synced with map markers
+- **Hover interaction** — hovering a list item highlights its marker and vice versa
+- **Click interaction** — clicking a card or marker flies the map to that location and opens a popup
+- **Category filter** — filter by Grand Prix / Sprint / Exhibition (affects both map and list)
+- **Location search** — geocoding via Nominatim, centers map on any city or address
+- **Dark / Light mode** — toggle in the header, persists via `localStorage`, defaults to OS preference
 
 ---
 
 ## Technical Decisions
 
-### React + Vite + TypeScript
-Vite provides near-instant HMR and build times compared to Create React App or Webpack-based setups. TypeScript adds static typing across the frontend, catching errors at compile time and improving maintainability as the codebase grows.
+**React + Vite + TypeScript** — fast HMR, type safety, minimal config overhead.
 
-### NestJS
-NestJS is an opinionated Node.js framework built on top of Express (with optional Fastify support). Its module/controller/service architecture enforces separation of concerns from day one, making it easier to scale the API as requirements grow. The strict TypeScript configuration further improves reliability.
+**NestJS** — module/controller/service structure enforces separation of concerns from day one. Easy to extend with a real database or CMS layer later.
 
-### React-Leaflet + OpenStreetMap
-React-Leaflet provides a declarative React wrapper around the battle-tested Leaflet.js mapping library. OpenStreetMap is used as the tile provider — completely open source and requiring no API key, which removes a barrier for local development and avoids vendor lock-in.
+**React-Leaflet + OpenStreetMap** — no API key, open source, well-maintained React wrapper around Leaflet.js.
 
-### Tailwind CSS
-Tailwind's utility-first approach allows rapid UI development without leaving JSX. It eliminates the overhead of naming CSS classes and keeps styles co-located with components, which improves readability and reduces context switching.
+**Plain CSS with custom properties** — CSS variables on `[data-theme]` handle dark/light theming without adding a runtime styling dependency. Keeps the bundle lean.
 
-### Monorepo with npm Workspaces
-Keeping both `apps/web` and `apps/api` in a single repository makes it easy to share types, run both apps with a single command, and manage the project as a cohesive unit. npm workspaces (built into npm 7+) handles cross-package linking with no additional tooling required.
+**Data model** — designed to be CMS-extendable. Each event has `id`, `title`, `description`, `address`, `country`, `coordinates`, `category`, `date`, and optional `imageUrl`. Maps cleanly to a Contentful or Sanity content type.
 
-### Data Model
-Each air race event is designed with a CMS-extendable shape:
+**Categories** — `Grand Prix`, `Sprint`, `Exhibition` instead of opaque A/B labels — meaningful to users and easier to extend.
 
-```ts
-interface AirRaceEvent {
-  id: string;
-  title: string;
-  description: string;
-  address: string;
-  country: string;
-  coordinates: { lat: number; lng: number };
-  category: string;       // e.g. "Red Bull Air Race", "Airshow", "Pylon Racing"
-  imageUrl: string;
-  date: string;           // ISO 8601
-}
-```
-
-This structure maps cleanly to content types in headless CMS platforms like Contentful or Sanity, making a future CMS integration straightforward.
+**`useEvents` hook** — fetches from the NestJS API; the static seed data in `apps/web/src/data/events.ts` acts as a fallback and mirrors the API data exactly.
 
 ---
+
