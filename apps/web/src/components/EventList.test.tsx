@@ -29,7 +29,7 @@ const events: RaceEvent[] = [
 describe('EventList', () => {
   it('renders all events', () => {
     render(
-      <EventList events={events} activeId={null} onHover={vi.fn()} onSelect={vi.fn()} />
+      <EventList events={events} activeId={null} onHover={vi.fn()} onSelect={vi.fn()} onViewDetail={vi.fn()} />
     );
     expect(screen.getByText('Abu Dhabi Grand Prix')).toBeInTheDocument();
     expect(screen.getByText('San Diego Sprint')).toBeInTheDocument();

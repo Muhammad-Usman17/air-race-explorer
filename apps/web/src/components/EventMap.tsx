@@ -3,7 +3,6 @@ import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import type { RaceEvent } from '../types/event';
 
-// Fix default marker icon path issue with Vite bundling
 import markerIconUrl from 'leaflet/dist/images/marker-icon.png';
 import markerIcon2xUrl from 'leaflet/dist/images/marker-icon-2x.png';
 import markerShadowUrl from 'leaflet/dist/images/marker-shadow.png';
@@ -15,32 +14,31 @@ L.Icon.Default.mergeOptions({
   shadowUrl: markerShadowUrl,
 });
 
+const CATEGORY_COLORS: Record<string, string> = {
+  'Grand Prix': '#3b82f6',
+  Sprint: '#10b981',
+  Exhibition: '#8b5cf6',
+};
+
 function createMarkerIcon(isActive: boolean, category: string) {
-  const categoryColors: Record<string, string> = {
-    'Grand Prix': '#3b82f6',  // blue
-    Sprint: '#10b981',        // emerald
-    Exhibition: '#8b5cf6',    // purple
-  };
-  const color = isActive ? '#f59e0b' : (categoryColors[category] ?? '#64748b');
+  const size = isActive ? 22 : 16;
+  const color = isActive ? '#f59e0b' : (CATEGORY_COLORS[category] ?? '#64748b');
+  const ring = isActive ? `box-shadow: 0 0 0 3px rgba(245,158,11,0.35), 0 2px 8px rgba(0,0,0,0.5);` : `box-shadow: 0 2px 6px rgba(0,0,0,0.4);`;
   return L.divIcon({
     className: '',
-    html: `
-      <div style="
-        width: ${isActive ? 20 : 16}px;
-        height: ${isActive ? 20 : 16}px;
-        background: ${color};
-        border: 2px solid white;
-        border-radius: 50%;
-        box-shadow: 0 2px 6px rgba(0,0,0,0.4);
-        transition: all 0.2s ease;
-      "></div>
-    `,
-    iconSize: [isActive ? 20 : 16, isActive ? 20 : 16],
-    iconAnchor: [isActive ? 10 : 8, isActive ? 10 : 8],
+    html: `<div style="
+      width:${size}px; height:${size}px;
+      background:${color};
+      border: 2.5px solid white;
+      border-radius: 50%;
+      ${ring}
+      transition: all 0.2s ease;
+    "></div>`,
+    iconSize: [size, size],
+    iconAnchor: [size / 2, size / 2],
   });
 }
 
-// Sub-component: pans map to selected event or search target
 function MapController({
   selectedEvent,
   searchTarget,
@@ -63,57 +61,61 @@ function MapController({
   return null;
 }
 
-// Sub-component: holds imperative marker refs and syncs hover state
 interface MarkersLayerProps {
   events: RaceEvent[];
   activeId: string | null;
   onHover: (id: string | null) => void;
   onSelect: (event: RaceEvent) => void;
+  onViewDetail: (event: RaceEvent) => void;
 }
 
-function MarkersLayer({ events, activeId, onHover, onSelect }: MarkersLayerProps) {
+function MarkersLayer({ events, activeId, onHover, onSelect, onViewDetail }: MarkersLayerProps) {
   const markerRefs = useRef<Map<string, L.Marker>>(new Map());
 
-  // Open popup for the active (selected) event programmatically
   useEffect(() => {
     markerRefs.current.forEach((marker, id) => {
-      if (id === activeId) {
-        marker.openPopup();
-      }
+      if (id === activeId) marker.openPopup();
     });
   }, [activeId]);
 
   return (
     <>
-      {events.map((event) => (
-        <Marker
-          key={event.id}
-          position={[event.coordinates.lat, event.coordinates.lng]}
-          icon={createMarkerIcon(activeId === event.id, event.category)}
-          ref={(ref) => {
-            if (ref) markerRefs.current.set(event.id, ref);
-            else markerRefs.current.delete(event.id);
-          }}
-          eventHandlers={{
-            mouseover: () => onHover(event.id),
-            mouseout: () => onHover(null),
-            click: () => onSelect(event),
-          }}
-        >
-          <Popup>
-            <div className="map-popup">
-              <span className={`category-badge category-badge--${event.category.toLowerCase().replace(' ', '-')}`}>
-                {event.category}
-              </span>
-              <strong>{event.title}</strong>
-              <p>{event.description}</p>
-              <small>
-                {event.address}, {event.country}
-              </small>
-            </div>
-          </Popup>
-        </Marker>
-      ))}
+      {events.map((event) => {
+        const slug = event.category.toLowerCase().replace(' ', '-');
+        return (
+          <Marker
+            key={event.id}
+            position={[event.coordinates.lat, event.coordinates.lng]}
+            icon={createMarkerIcon(activeId === event.id, event.category)}
+            ref={(ref) => {
+              if (ref) markerRefs.current.set(event.id, ref);
+              else markerRefs.current.delete(event.id);
+            }}
+            eventHandlers={{
+              mouseover: () => onHover(event.id),
+              mouseout: () => onHover(null),
+              click: () => onSelect(event),
+            }}
+          >
+            <Popup>
+              <div className="map-popup">
+                <span className={`category-badge category-badge--${slug}`}>
+                  {event.category}
+                </span>
+                <strong>{event.title}</strong>
+                <p>{event.description}</p>
+                <small>📍 {event.address}, {event.country}</small>
+                <button
+                  className="map-popup__detail-btn"
+                  onClick={() => onViewDetail(event)}
+                >
+                  View details →
+                </button>
+              </div>
+            </Popup>
+          </Marker>
+        );
+      })}
     </>
   );
 }
@@ -125,6 +127,7 @@ interface EventMapProps {
   searchTarget: { lat: number; lng: number; label: string } | null;
   onHover: (id: string | null) => void;
   onSelect: (event: RaceEvent) => void;
+  onViewDetail: (event: RaceEvent) => void;
 }
 
 export function EventMap({
@@ -134,6 +137,7 @@ export function EventMap({
   searchTarget,
   onHover,
   onSelect,
+  onViewDetail,
 }: EventMapProps) {
   return (
     <div className="map-container">
@@ -153,6 +157,7 @@ export function EventMap({
           activeId={activeId}
           onHover={onHover}
           onSelect={onSelect}
+          onViewDetail={onViewDetail}
         />
       </MapContainer>
     </div>

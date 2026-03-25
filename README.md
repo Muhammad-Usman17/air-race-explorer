@@ -1,6 +1,22 @@
 # Air Race Explorer
 
-An interactive explorer for an international Air Race event series — built as a full-stack demo for Zooom Productions.
+An interactive explorer for an international Air Race event series built as a full-stack demo for Zooom Productions.
+
+---
+
+## Screenshots
+
+**Explorer — light mode (world view)**
+![Explorer light mode](apps/web/public/screenshots/Screenshot%202026-03-26%20at%202.36.19%20AM.png)
+
+**Explorer — dark mode with map popup**
+![Explorer dark mode with popup](apps/web/public/screenshots/Screenshot%202026-03-26%20at%202.35.59%20AM.png)
+
+**Explorer — dark mode, marker selected**
+![Explorer dark mode marker](apps/web/public/screenshots/Screenshot%202026-03-26%20at%202.36.37%20AM.png)
+
+**Event detail page**
+![Event detail page](apps/web/public/screenshots/Screenshot%202026-03-26%20at%202.36.45%20AM.png)
 
 ---
 
