@@ -6,6 +6,10 @@ on:
   pull_request:
     branches: [main]
 
+# Railway deployment is handled automatically via GitHub repo connection.
+# Connect your repo at railway.app → New Project → Deploy from GitHub repo.
+# Railway will auto-deploy on every push to main after this CI passes.
+
 jobs:
   test-api:
     name: Test API
@@ -32,21 +36,3 @@ jobs:
           cache-dependency-path: package-lock.json
       - run: npm ci
       - run: npm test --workspace=apps/web
-
-  deploy:
-    name: Deploy to Railway
-    needs: [test-api, test-web]
-    runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-    steps:
-      - uses: actions/checkout@v4
-      - name: Install Railway CLI
-        run: npm install -g @railway/cli
-      - name: Deploy API
-        env:
-          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
-        run: railway up --service air-race-api --detach
-      - name: Deploy Web
-        env:
-          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
-        run: railway up --service air-race-web --detach
