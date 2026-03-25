@@ -7,10 +7,11 @@ An interactive explorer for an international Air Race event series built as a fu
 ## Screenshots
 
 **Explorer — light mode (world view)**
+![Explorer dark mode with popup](screenshots/explorer-dark-popup.png)
+
+**Explorer — light mode with map popup**
 ![Explorer light mode](screenshots/explorer-light.png)
 
-**Explorer — dark mode with map popup**
-![Explorer dark mode with popup](screenshots/explorer-dark-popup.png)
 
 **Explorer — dark mode, marker selected**
 ![Explorer dark mode marker](screenshots/explorer-dark-marker.png)
