@@ -37,14 +37,14 @@ describe('EventList', () => {
 
   it('shows empty state when events array is empty', () => {
     render(
-      <EventList events={[]} activeId={null} onHover={vi.fn()} onSelect={vi.fn()} />
+      <EventList events={[]} activeId={null} onHover={vi.fn()} onSelect={vi.fn()} onViewDetail={vi.fn()} />
     );
     expect(screen.getByText(/No events found/)).toBeInTheDocument();
   });
 
   it('passes activeId to EventCard', () => {
     const { container } = render(
-      <EventList events={events} activeId="1" onHover={vi.fn()} onSelect={vi.fn()} />
+      <EventList events={events} activeId="1" onHover={vi.fn()} onSelect={vi.fn()} onViewDetail={vi.fn()} />
     );
     const cards = container.querySelectorAll('.event-card');
     expect(cards[0]).toHaveClass('active');
